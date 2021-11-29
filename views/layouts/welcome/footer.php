@@ -36,6 +36,7 @@
                     fd.append('stock', this.selectedStock);
                     fd.append('startDate', this.startDate);
                     fd.append('endDate', this.endDate);
+                    console.log(fd);
                 }
             },
             isFormValid() {
@@ -49,21 +50,17 @@
                 }
                 return isValid;
             },
-            parseCSV(text, hasTags = false){
+            parseCSV(text){
+                this.stockList = [];
                 const delimiter = ',';
                 const rowDelimiter = '\n';
-                if (hasTags) {
-                    this.tags = text.slice(0, text.indexOf('\n')).split(delimiter)
-                }
-                const rows = text.slice(text.indexOf('\n')).split(rowDelimiter);
+                const tags = text.slice(0, text.indexOf(rowDelimiter)).split(delimiter);
+                const rows = text.slice(text.indexOf('\n') + 1).split(rowDelimiter);
                 const data = [];
                 const stocks = [];
-                this.tags.map((tag, tagIndex) => {
+                tags.map((tag, tagIndex) => {
                     rows.forEach((row, index) => {
                         const rowData = row.split(delimiter);
-                        if(tag === 'stock_name') {
-                           rowData[tagIndex] = rowData[tagIndex] + index;
-                        }
                         if (tag === 'stock_name' && !stocks.includes(rowData[tagIndex])) {
                             stocks.push(rowData[tagIndex]);
                             this.stockList.push(rowData[tagIndex]);
