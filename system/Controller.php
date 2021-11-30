@@ -5,8 +5,21 @@ namespace App\System;
 use Error;
 use stdClass;
 
+/**
+ * Class Controller
+ * @package App\System\Controller
+ */
 class Controller
 {
+    protected $request;
+
+    /**
+     * @param Request $request
+     */
+    public function __construct(Request $request)
+    {
+        $this->request = $request;
+    }
 
     /**
      * @param $viewData
