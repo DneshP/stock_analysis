@@ -2,3 +2,4 @@
 /runtime/*
 !/runtime
 .idea
+.env

@@ -11,5 +11,7 @@
             "email": "dineshparadesi94@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "vlucas/phpdotenv": "^5.4"
+    }
 }
