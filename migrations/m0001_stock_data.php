@@ -14,9 +14,9 @@ class m0001_stock_data
     {
         $SQL = "CREATE TABLE stock_data (
                 id_no INT AUTO_INCREMENT PRIMARY KEY,
-                date DATE NOT NULL,
-                stock_name VARCHAR(255) NOT NULL,
-                price VARCHAR(255) NOT NULL
+                date DATE,
+                stock_name VARCHAR(255),
+                price FLOAT
             )  ENGINE=INNODB;";
         $this->db()->pdo->exec($SQL);
     }
