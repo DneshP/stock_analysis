@@ -2,9 +2,11 @@
 
 namespace App\Controllers;
 
+use App\System\Application;
 use App\System\Controller;
 use App\System\Request;
 use App\Models\Welcome as WelcomeModel;
+use Exception;
 
 /**
  * Class Welcome
@@ -12,6 +14,7 @@ use App\Models\Welcome as WelcomeModel;
  */
 class Welcome extends Controller
 {
+    /** @var string  */
     private $header = 'layouts/header';
 
     /** @var WelcomeModel */
@@ -59,6 +62,9 @@ class Welcome extends Controller
     public function streamStockData()
     {
         $stream = json_decode(file_get_contents('php://input'));
+        if (isset($stream->fresh)) {
+            $this->model->fresh();
+        }
         if ($stream->status === 'on') {
             $data = explode( ';base64,', $stream->chunk);
             if (isset($data[1])) {
@@ -81,6 +87,7 @@ class Welcome extends Controller
                             array_shift($raw);
                         if (!empty($raw)) {
                             $raw[0] = $this->formatDate($raw[0]);
+                            $raw[1] = strtolower($raw[1]);
                             for ($i = 0; $i < count($this->model->columns()); $i++ ) {
                                 $value = $raw[$i] ?? null;
                                 $raw[$i] = "'$value'";
@@ -89,19 +96,31 @@ class Welcome extends Controller
                             $data [] = "(".$stock.")";
                          }
                 }
-                 $status = $this->model->insertStockData(implode(',', $data));
-                 $message = $status ? 'Received Chunk' : 'Error Receiving Chunk. Internal server error';
+                 return $this->model->insertStockData(implode(',', $data));
             } else {
-                $status = true;
-                $message = 'Empty Chunk';
+               return Application::jsend_success();
             }
-            return json_encode(['status' => $status, 'data' => $message]);
         }
         if ($stream->status === 'done') {
-               $data = $this->model->getStockNames();
-               $status = $data ?: false;
-           return json_encode(['status' => $status, 'data' => json_encode($data)]);
+               return $this->model->getStockNames();
         }
+    }
+
+    /**
+     * @return string
+     * @throws Exception
+     */
+    public function analyseStockData(): string
+    {
+        $data = $this->request->getBody();
+        if (isset($data->stock)) {
+            $stock  = $data->stock;
+            $startDate = $this->formatDate($data->startDate);
+            $endDate = $this->formatDate($data->endDate);
+            $dateRange = ['start' => $startDate, 'end' => $endDate];
+            return $this->model->getStockDataForADateRange($stock, $dateRange);
+        }
+        return Application::jsend_error('Data Missing');
     }
 
     /**
