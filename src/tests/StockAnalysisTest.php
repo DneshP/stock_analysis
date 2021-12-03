@@ -79,6 +79,34 @@ class StockAnalysisTest extends TestCase
     }
 
     /**
+     * If stock price is zero fetches the previous stock price
+     * @throws GuzzleException
+     */
+    public function testIfZeroFetchesThePreviousPrice()
+    {
+        self::$stockDataSeeder->seedStockData(self::$stockDataSeeder->zeroStockPrice);
+        $expected = new stdClass();
+        $expected->buyDate = '11-02-2020';
+        $expected->sellDate = '16-02-2020';
+        $expected->profit = 130;
+        $expected->meanStockPrice = 1477.286;
+        $expected->standardDeviation = 55.874;
+
+        $post = self::$client->post(self::$uri . 'analyseStockData',
+            [
+                'form_params' => [
+                    'stock'     => 'googl',
+                    'startDate' => '2020-02-01',
+                    'endDate' => '2021-02-02'
+                ]
+            ]);
+        $response = json_decode($post->getBody());
+        $this->assertEquals(true, $response->status);
+        $data = $response->data;
+        $this->assertValues($expected, $data);
+    }
+
+    /**
      * Analyse minimal loss option
      * @throws GuzzleException
      */
