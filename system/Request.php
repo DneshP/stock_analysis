@@ -42,9 +42,9 @@ class Request
     }
 
     /**
-     * @return array
+     * @return object
      */
-    public function getBody(): array
+    public function getBody(): object
     {
         $body = [];
 
@@ -60,7 +60,7 @@ class Request
                 }
             }
         }
-        return $body;
+        return (object)$body;
     }
 
 }

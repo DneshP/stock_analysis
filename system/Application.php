@@ -32,4 +32,26 @@ class Application
     {
         echo $this->router->resolve();
     }
+
+    /**
+     * success response
+     * @todo move to helpers
+     * @param any $data
+     * @return string
+     */
+    public static function jsend_success($data = ''): string
+    {
+        return json_encode(['status' => true, 'data' => $data]);
+    }
+
+    /**
+     * error response
+     * @todo move to helpers
+     * @param any $data
+     * @return string
+     */
+    public static function jsend_error($data = ''): string
+    {
+        return json_encode(['status' => false, 'data' => $data]);
+    }
 }
