@@ -6,6 +6,7 @@ use App\Database\StockDataSeed;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class StockAnalysisTest extends TestCase
 {
@@ -13,7 +14,7 @@ class StockAnalysisTest extends TestCase
     private static $client;
 
     /** @var string Base URL */
-    private static $uri = 'http://localhost/test/stock_analysis';
+    private static $uri;
 
     /**
      * @var StockDataSeed
@@ -22,6 +23,9 @@ class StockAnalysisTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
+        /** To fetch the base url */
+        require_once __DIR__ . DIRECTORY_SEPARATOR . '../config/Config.php';
+        self::$uri = BASE_URL;
         self::$client = new Client([
             'base_uri' => self::$uri
         ]);
@@ -49,7 +53,7 @@ class StockAnalysisTest extends TestCase
      */
     public function testAccessWelcome()
     {
-        $response = self::$client->get(self::$uri . '/welcome');
+        $response = self::$client->get(self::$uri . 'welcome');
         $this->assertEquals(200, $response->getStatusCode());
     }
 
@@ -61,7 +65,7 @@ class StockAnalysisTest extends TestCase
     {
         self::$stockDataSeeder->seedStockData();
 
-        $post = self::$client->post(self::$uri . '/analyseStockData',
+        $post = self::$client->post(self::$uri . 'analyseStockData',
             [
                 'form_params' => [
                     'stock'     => 'appl',
@@ -74,16 +78,21 @@ class StockAnalysisTest extends TestCase
         $this->assertEquals('Not enough data to analyse, try changing the date range or pick a different stock.', $response->data);
     }
 
+    /**
+     * Analyse minimal loss option
+     * @throws GuzzleException
+     */
     public function testMinimiseLoss()
     {
         self::$stockDataSeeder->seedStockData(self::$stockDataSeeder->minimiseLossData);
-        $buyDate = '11-02-2020';
-        $sellDate = '12-02-2020';
-        $profit = -1;
-        $meanStockPrice = 1455;
-        $standardDeviation = 198.879;
+        $expected = new stdClass();
+        $expected->buyDate = '11-02-2020';
+        $expected->sellDate = '12-02-2020';
+        $expected->profit = -1;
+        $expected->meanStockPrice = 1455;
+        $expected->standardDeviation = 198.879;
 
-        $post = self::$client->post(self::$uri . '/analyseStockData',
+        $post = self::$client->post(self::$uri . 'analyseStockData',
             [
                 'form_params' => [
                     'stock'     => 'googl',
@@ -94,11 +103,7 @@ class StockAnalysisTest extends TestCase
         $response = json_decode($post->getBody());
         $this->assertEquals(true, $response->status);
         $data = $response->data;
-        $this->assertEquals($buyDate, $data->buySellDates->buy->date);
-        $this->assertEquals($sellDate, $data->buySellDates->sell->date);
-        $this->assertEquals($profit, $data->buySellDates->profit);
-        $this->assertEquals($meanStockPrice, $data->meanStockPrice);
-        $this->assertEquals($standardDeviation, $data->standardDeviation);
+        $this->assertValues($expected, $data);
     }
 
     /**
@@ -108,11 +113,12 @@ class StockAnalysisTest extends TestCase
     public function testMaximiseProfit()
     {
         self::$stockDataSeeder->seedStockData();
-        $buyDate = '14-02-2020';
-        $sellDate = '16-02-2020';
-        $profit = 10;
-        $meanStockPrice = 1509.857;
-        $standardDeviation = 18.65;
+        $expected = new stdClass();
+        $expected->buyDate = '14-02-2020';
+        $expected->sellDate = '16-02-2020';
+        $expected->profit = 10;
+        $expected->meanStockPrice = 1509.857;
+        $expected->standardDeviation = 18.65;
 
         $post = self::$client->post(self::$uri . '/analyseStockData',
             [
@@ -125,10 +131,21 @@ class StockAnalysisTest extends TestCase
         $response = json_decode($post->getBody());
         $this->assertEquals(true, $response->status);
         $data = $response->data;
-        $this->assertEquals($buyDate, $data->buySellDates->buy->date);
-        $this->assertEquals($sellDate, $data->buySellDates->sell->date);
-        $this->assertEquals($profit, $data->buySellDates->profit);
-        $this->assertEquals($meanStockPrice, $data->meanStockPrice);
-        $this->assertEquals($standardDeviation, $data->standardDeviation);
+        $this->assertValues($expected, $data);
+    }
+
+    /**
+     * Assert expected and actual
+     * @param $expected
+     * @param $actual
+     */
+    private function assertValues($expected, $actual)
+    {
+        $this->assertEquals($expected->buyDate, $actual->buySellDates->buy->date);
+        $this->assertEquals($expected->sellDate, $actual->buySellDates->sell->date);
+        $this->assertEquals($expected->profit, $actual->buySellDates->profit);
+        $this->assertEquals($expected->meanStockPrice, $actual->meanStockPrice);
+        $this->assertEquals($expected->standardDeviation, $actual->standardDeviation);
+
     }
 }
