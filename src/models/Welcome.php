@@ -133,7 +133,6 @@ class Welcome extends Model
         $buySellDates = $this->getBuySellDates();
         $meanStockPrice = $this->meanStockPrice();
         $standardDeviation = $this->calculateStandardDeviation();
-
         if (!$meanStockPrice || !$standardDeviation || !$buySellDates) {
             return Application::$app->jsend_error('Error calculating numbers, Internal server error');
         }
@@ -255,6 +254,9 @@ class Welcome extends Model
         $currentMax = (object)['price' => 0, 'index' => 0];
         $currentMin = (object)['price' => 0, 'index' => 0];
         foreach ($data as $key => $stock) {
+            if ($stock->price === 0) {
+                $stock->price = $stock[$key - 1] ?? 0;
+            }
             if ($currentMax->price < (float) $stock->price) {
                 $currentMax->price = (float) $stock->price;
                 $currentMax->index = $key;
@@ -288,6 +290,12 @@ class Welcome extends Model
             ];
         foreach ($stocks as $i => $stock) {
            for ($j = $i + 1; $j < $count; $j++) {
+               if ($stock->price === 0) {
+                   $stock->price = $stock[$i - 1]->price ?? 0;
+               }
+               if ($stocks[$j]->price === 0) {
+                   $stocks[$j]->price = $stocks[$j - 1]->price ?? 0;
+               }
                $diff = (float)$stock->price - (float)$stocks[$j]->price;
                if ($diff < $minimiseLoss->amount) {
                    $minimiseLoss->price = $diff;

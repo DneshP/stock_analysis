@@ -87,6 +87,19 @@
         transform: translateX(10px);
         opacity: 0;
     }
+    .fade-form-enter-active {
+        transition: all .1s ease;
+    }
+    .fade-form-leave-active {
+        transition: all .3s ease;
+        /*transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);*/
+    }
+    .fade-form-enter, .fade-form-leave-to
+        /* .slide-fade-leave-active below version 2.1.8 */ {
+        transform: translate(50px);
+        opacity: 0;
+        transition: all .1s ease;
+    }
 </style>
 <div class="container-fluid form-container bg-transparent" id="stockDataAnalysis" v-cloak>
     <transition-group name="slide-fade">
@@ -95,9 +108,11 @@
                 <div class="row gx-5">
                     <div class="col p-3 border bg-light">
                         <p>Buy Date : {{   analysis.buySellDates?.buy.date }}</p>
+                        <p>Buy Price : {{   analysis.buySellDates?.buy.price }} Rupees</p>
                     </div>
                     <div class="col p-3 border bg-light">
                         <p>Sell Date : {{ analysis.buySellDates?.sell.date }}</p>
+                        <p>Sell Price : {{   analysis.buySellDates?.sell.price }} Rupees</p>
                     </div>
                     <div class="col p-3 border bg-light">
                         <div class=["row"] :class="{ 'isProfit' : isProfit, 'isMinimalLoss' : !isProfit }">
@@ -106,6 +121,12 @@
                                 <span v-else>Minimise Loss : </span>
                                 {{ analysis.buySellDates?.profit }} Rupees
                             </div>
+                        </div>
+                        <div class="row">
+                            <span>Shares Purchased : {{ analysis.buySellDates?.buy.shares }}</span>
+                        </div>
+                        <div class="row">
+                            <span>Shares Sold : {{ analysis.buySellDates?.sell.shares }}</span>
                         </div>
                     </div>
                 </div>
@@ -123,7 +144,7 @@
             </div>
         </div>
     </transition-group>
-    <transition-group name="slide-fade">
+    <transition-group name="fade-form">
         <form key="stockDataForm" id="stockDataForm" v-if="!showResults">
             <div :class="{'loader':isProcessing}"></div>
             <div class="row">
