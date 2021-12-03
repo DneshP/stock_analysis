@@ -36,7 +36,7 @@ class Application
     /**
      * success response
      * @todo move to helpers
-     * @param any $data
+     * @param mixed $data
      * @return string
      */
     public static function jsend_success($data = ''): string
@@ -47,7 +47,7 @@ class Application
     /**
      * error response
      * @todo move to helpers
-     * @param any $data
+     * @param mixed $data
      * @return string
      */
     public static function jsend_error($data = ''): string

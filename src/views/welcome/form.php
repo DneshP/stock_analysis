@@ -76,105 +76,123 @@
     .isMinimalLoss {
         color: #fd7e14;
     }
+    .slide-fade-enter-active {
+        transition: all .3s ease;
+    }
+    .slide-fade-leave-active {
+        transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+    }
+    .slide-fade-enter, .slide-fade-leave-to
+        /* .slide-fade-leave-active below version 2.1.8 */ {
+        transform: translateX(10px);
+        opacity: 0;
+    }
 </style>
 <div class="container-fluid form-container bg-transparent" id="stockDataAnalysis" v-cloak>
-    <div id="computedResults" v-if="showResults">
-        <div class="container px-4" style="overflow-wrap: break-word">
-            <div class="row gx-5">
-                <div class="col p-3 border bg-light">
-                    <p>Buy Date : {{   analysis.buySellDates.buy.date }}</p>
+    <transition-group name="slide-fade">
+        <div key="computedResults" id="computedResults" v-if="showResults">
+            <div class="container px-4" style="overflow-wrap: break-word">
+                <div class="row gx-5">
+                    <div class="col p-3 border bg-light">
+                        <p>Buy Date : {{   analysis.buySellDates?.buy.date }}</p>
+                    </div>
+                    <div class="col p-3 border bg-light">
+                        <p>Sell Date : {{ analysis.buySellDates?.sell.date }}</p>
+                    </div>
+                    <div class="col p-3 border bg-light">
+                        <div class=["row"] :class="{ 'isProfit' : isProfit, 'isMinimalLoss' : !isProfit }">
+                            <div class="col">
+                                <span v-if="isProfit">Profit : </span>
+                                <span v-else>Minimise Loss : </span>
+                                {{ analysis.buySellDates?.profit }} Rupees
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col p-3 border bg-light">
-                    <p>Sell Date : {{ analysis.buySellDates.sell.date }}</p>
-                </div>
-                <div class="col p-3 border bg-light">
-                      <div class=["row"] :class="{ 'isProfit' : isProfit, 'isMinimalLoss' : !isProfit }">
-                          <div class="col">
-                              <span v-if="isProfit">Profit</span>
-                              <span v-else>Minimise Loss</span>
-                              {{ analysis.buySellDates.profit }}
-                          </div>
-                      </div>
+                <div class="row gx-5">
+                    <div class="col p-3 border bg-light">
+                        <p> Mean Stock Price : {{ analysis.meanStockPrice }} </p>
+                    </div>
+                    <div class="col p-3 border bg-light">
+                        <p> Standard Deviation: {{ analysis.standardDeviation }} </p>
+                    </div>
                 </div>
             </div>
-            <div class="row gx-5">
-                <div class="col p-3 border bg-light">
-                    <p> Mean Stock Price : {{ analysis.meanStockPrice }} </p>
-                </div>
-                <div class="col p-3 border bg-light">
-                    <p> Standard Deviation: {{ analysis.standardDeviation }} </p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <form id="stockDataForm" v-else>
-        <div :class="{'loader':isProcessing}"></div>
-        <div class="row">
-            <div class="mb-3" :class="{'col-10' : isUploaded}">
-                <label for="stockData" class="form-label">Stock Data</label>
-                <input
-                    class="form-control is-invalid"
-                    type="file"
-                    id="stockData"
-                    aria-describedby="fileHelp"
-                    accept="text/csv"
-                    @change="uploadStockData"
-                    :disabled="isProcessing"
-                >
-                <div id="fileHelp" class="invalid-feedback" style="color: black">Please upload stock data file
-                    to begin. Accepted File format is csv.</div>
-            </div>
-            <div class="col-2" v-if="isUploaded">
-                <span class="deleteIcon" @click="clearFileData">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 0 24 24" width="35px"
-                         fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path
-                        d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z"/>
-                    </svg>
-                </span>
+            <div class="text-center m-2">
+                <button class="btn btn-secondary" @click="refresh">Try another</button>
             </div>
         </div>
-        <div class="mb-3">
-            <div class="form-floating">
-                <select
-                    class="form-select"
-                    id="selectedStock"
-                    aria-label="Stock"
-                    v-model="selectedStock"
-                    @blur="validatePickAStock"
-                    @click="validateStockList">
-                    <option v-if="stockList.length>0"
-                            v-for="stock in stockList">{{ stock }}</option>
-                </select>
-                <label for="stock">Pick a stock</label>
-            </div>
-        </div>
+    </transition-group>
+    <transition-group name="slide-fade">
+        <form key="stockDataForm" id="stockDataForm" v-if="!showResults">
+            <div :class="{'loader':isProcessing}"></div>
             <div class="row">
-                <div class="col form-floating mb-3">
+                <div class="mb-3" :class="{'col-10' : isUploaded}">
+                    <label for="stockData" class="form-label">Stock Data</label>
                     <input
-                        type="date"
-                        id="startDate"
-                        class="form-control"
-                        placeholder="Start date"
-                        @blur="validateDate"
-                        v-model="startDate"
+                        class="form-control is-invalid"
+                        type="file"
+                        id="stockData"
+                        aria-describedby="fileHelp"
+                        accept="text/csv"
+                        @change="uploadStockData"
+                        :disabled="isProcessing"
                     >
-                    <label for="startDate">Start Date</label>
+                    <div id="fileHelp" class="invalid-feedback" style="color: black">Please upload stock data file
+                        to begin. Accepted File format is csv.</div>
                 </div>
-                <div class="col form-floating mb-3">
-                    <input
-                        type="date"
-                        id="endDate"
-                        class="form-control"
-                        placeholder="End date"
-                        aria-label="End Date"
-                        @blur="validateDate"
-                        v-model="endDate"
-                    >
-                    <label for="endDate">End Date</label>
+                    <div class="col-2" v-if="isUploaded">
+                        <span class="deleteIcon" @click="clearFileData">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 0 24 24" width="35px"
+                                 fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path
+                                d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z"/>
+                            </svg>
+                        </span>
+                    </div>
+            </div>
+            <div class="mb-3">
+                <div class="form-floating">
+                    <select
+                        class="form-select"
+                        id="selectedStock"
+                        aria-label="Stock"
+                        v-model="selectedStock"
+                        @blur="validatePickAStock"
+                        @click="validateStockList">
+                        <option v-if="stockList.length>0"
+                                v-for="stock in stockList">{{ stock }}</option>
+                    </select>
+                    <label for="stock">Pick a stock</label>
                 </div>
             </div>
-        <div class="text-center">
-            <a type="button" class="btn btn-primary" @click="submit">Submit</a>
-        </div>
+                <div class="row">
+                    <div class="col form-floating mb-3">
+                        <input
+                            type="date"
+                            id="startDate"
+                            class="form-control"
+                            placeholder="Start date"
+                            @blur="validateDate"
+                            v-model="startDate"
+                        >
+                        <label for="startDate">Start Date</label>
+                    </div>
+                    <div class="col form-floating mb-3">
+                        <input
+                            type="date"
+                            id="endDate"
+                            class="form-control"
+                            placeholder="End date"
+                            aria-label="End Date"
+                            @blur="validateDate"
+                            v-model="endDate"
+                        >
+                        <label for="endDate">End Date</label>
+                    </div>
+                </div>
+            <div class="text-center">
+                <a type="button" class="btn btn-primary" @click="submit">Submit</a>
+            </div>
     </form>
+    </transition-group>
 </div>

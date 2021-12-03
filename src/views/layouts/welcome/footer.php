@@ -55,6 +55,7 @@
                     let message;
                     let type = 'error';
                     if (response.status) {
+                        this.clearFileData(true);
                         this.analysis = response.data;
                         this.showResults = !this.showResults;
                         return;
@@ -63,6 +64,13 @@
                     }
                     this.notify(message, type);
                 }
+            },
+            refresh() {
+                this.stockData = '';
+                this.selectedStock = '';
+                this.startDate = '';
+                this.endDate = '';
+                this.showResults = !this.showResults;
             },
             isFormValid() {
                 const fields = JSON.parse(JSON.stringify(this.fields));
@@ -75,10 +83,12 @@
                 }
                 return isValid;
             },
-            clearFileData() {
+            clearFileData(hide = false) {
                 const input = document.getElementById('stockData');
                 input.value = '';
-                this.notify('File removed', 'success');
+                if (!hide) {
+                    this.notify('File removed', 'success');
+                }
                 input.classList.add('is-invalid');
                 this.stockData = '';
                 this.stockList = [];
