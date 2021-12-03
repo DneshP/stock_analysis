@@ -1,5 +1,1 @@
-/vendor/
-/runtime/*
-!/runtime
 .idea
-.env

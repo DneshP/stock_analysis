@@ -20,7 +20,7 @@ class Welcome extends Model
     private $stockData;
 
     /** @var string  */
-    private static $TABLE_NAME = 'stock_data';
+    public static $TABLE_NAME = 'stock_data';
 
     /** @var string[]  */
     private static $COLUMNS = ['date', 'stock_name', 'price'];
@@ -127,7 +127,7 @@ class Welcome extends Model
         $get->orderBy = ['ORDER BY date ASC'];
         $this->stockData = $this->fetch($get);
         if (empty($this->stockData) || count($this->stockData) === 1) {
-            return Application::$app->jsend_error('Not much data to analyse, try changing the date range.');
+            return Application::$app->jsend_error('Not enough data to analyse, try changing the date range or pick a different stock.');
         }
 
         $buySellDates = $this->getBuySellDates();
