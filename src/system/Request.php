@@ -5,11 +5,13 @@ namespace App\System;
 class Request
 {
     /**
-     * @return false|mixed|string
+     * @return false|string
      */
     public function getPath()
     {
-        $path = $_SERVER['REQUEST_URI'];
+        $requestPathParts = explode('/',$_SERVER['REQUEST_URI']);
+        $basePath = parse_url(BASE_URL)['path'];
+        $path = '/' . implode(',', array_diff($requestPathParts, explode('/',$basePath)));
         $position = strpos($path, '?');
         if ($position === false) {
             return $path;

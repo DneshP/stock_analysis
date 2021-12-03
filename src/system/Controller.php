@@ -68,7 +68,6 @@ class Controller
            return VIEWS_PATH. DIRECTORY_SEPARATOR . $values . '.php';
        }
        $path = VIEWS_PATH;
-
        for ($i = 0; $i <= $levels - 1; $i++) {
            $path .= DIRECTORY_SEPARATOR . $pathParts[$i];
            if ($i === $levels - 1) {
