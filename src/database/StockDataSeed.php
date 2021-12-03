@@ -12,6 +12,9 @@ class StockDataSeed
     /** @var int  */
     public $minimiseLossData = 1;
 
+    /** @var int  */
+    public $zeroStockPrice = 2;
+
     /** @var PDO  */
     public $pdo;
 
@@ -38,8 +41,43 @@ class StockDataSeed
     {
         $this->fresh();
         //Ideally we would have factories but to simplify
-        $SQL = $mode === $this->minimiseLossData ? $this->minimiseLossData() : $this->initialStockData();
+        if ($mode == $this->minimiseLossData) {
+            $SQL = $this->minimiseLossData();
+        } else if ($mode === $this->zeroStockPrice) {
+            $SQL = $this->zeroStockPrice();
+        } else {
+            $SQL = $this->initialStockData();
+        }
         $this->pdo->exec($SQL);
+    }
+
+    /**
+     * SQL with zero stock price
+     * @return string
+     */
+    private function zeroStockPrice(): string
+    {
+        return "INSERT INTO stock_data (`date`, `stock_name`, `price`) VALUES
+                    ('2020-02-11', 'aapl', 320),
+                    ('2020-02-11', 'googl', 1400),
+                    ('2020-02-11', 'msft', 185),
+                    ('2020-02-12', 'googl', 0),
+                    ('2020-02-12', 'msft', 184),
+                    ('2020-02-13', 'aapl', 324),
+                    ('2020-02-14', 'googl', 1520),
+                    ('2020-02-15', 'aapl', 319),
+                    ('2020-02-15', 'googl', 1523),
+                    ('2020-02-15', 'msft', 189),
+                    ('2020-02-16', 'googl', 1530),
+                    ('2020-02-18', 'aapl', 319),
+                    ('2020-02-18', 'msft', 187),
+                    ('2020-02-19', 'aapl', 323),
+                    ('2020-02-21', 'aapl', 313),
+                    ('2020-02-21', 'googl', 1483),
+                    ('2020-02-21', 'msft', 178),
+                    ('2020-02-22', 'googl', 1485),
+                    ('2020-02-22', 'msft', 180),
+                    ('2020-02-23', 'aapl', 320)";
     }
 
     /**
