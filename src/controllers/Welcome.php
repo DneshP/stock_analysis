@@ -86,14 +86,18 @@ class Welcome extends Controller
                         $raw = explode(',', $r);
                             array_shift($raw);
                         if (!empty($raw)) {
-                            $raw[0] = $this->formatDate($raw[0]);
-                            $raw[1] = strtolower($raw[1]);
-                            for ($i = 0; $i < count($this->model->columns()); $i++ ) {
-                                $value = $raw[$i] ?? null;
-                                $raw[$i] = "'$value'";
+                            if (empty(array_diff([0,1,2], array_keys($raw)))) {
+                                $raw[0] = $this->formatDate($raw[0]);
+                                $raw[1] = strtolower($raw[1]);
+                                for ($i = 0; $i < count($this->model->columns()); $i++ ) {
+                                    $value = $raw[$i] ?? null;
+                                    $raw[$i] = "'$value'";
+                                }
+                                $stock = implode(',', $raw);
+                                $data [] = "(".$stock.")";
+                            } else {
+                                Application::log("Missing row id " . json_encode($raw), 'missing.txt');
                             }
-                            $stock = implode(',', $raw);
-                            $data [] = "(".$stock.")";
                          }
                 }
                  return $this->model->insertStockData(implode(',', $data));
@@ -160,5 +164,4 @@ class Welcome extends Controller
         }
         return $formattedDate;
     }
-
 }

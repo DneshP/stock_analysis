@@ -11,6 +11,7 @@
             "email": "dineshparadesi94@gmail.com"
         }
     ],
+    "license": "MIT",
     "platform": {
         "php": "7.2"
     },

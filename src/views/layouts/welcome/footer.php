@@ -1,6 +1,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+<script src="<?=ASSETS_URL?>/js/vue.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.js" integrity="sha512-OmBbzhZ6lgh87tQFDVBHtwfi6MS9raGmNvUNTjDIBb/cgv707v9OuBVpsN6tVVTLOehRFns+o14Nd0/If0lE/A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
     const stockAnalysis = new Vue({
@@ -55,7 +55,7 @@
                     let message;
                     let type = 'error';
                     if (response.status) {
-                        this.clearFileData(true);
+                        this.clearFileData(false);
                         this.analysis = response.data;
                         this.showResults = !this.showResults;
                         return;
@@ -83,19 +83,20 @@
                 }
                 return isValid;
             },
-            clearFileData(hide = false) {
+            clearFileData(showNotification = true) {
                 const input = document.getElementById('stockData');
                 input.value = '';
-                if (!hide) {
+                if (showNotification) {
                     this.notify('File removed', 'success');
                 }
                 input.classList.add('is-invalid');
                 this.stockData = '';
                 this.stockList = [];
                 this.allStock = [];
-                this.isUploaded = !this.isUploaded;
+                this.isUploaded = false;
             },
             async uploadStockData(event) {
+                console.log(event)
                 this.stockList = [];
                 const input = document.getElementById('stockData');
                 const pattern = /^([a-zA-Z0-9\s_\\.\-:(0-9)])+(.csv)$/;
@@ -140,7 +141,7 @@
                             if (nextSlice < this.stockData.size) {
                                 resolve({status: true});
                                 await this.readCSV(nextSlice);
-                            }else {
+                            } else {
                                 const config = {
                                     method: 'POST',
                                     mode: 'cors',
@@ -154,16 +155,16 @@
                                 const response = await this.postData('<?=BASE_URL?>' + '/streamStockData', config);
                                 if (response.status) {
                                     this.stockList = response.data.map(stock => stock.toUpperCase());
-                                    this.isUploaded = !this.isUploaded;
-                                    this.isProcessing = !this.isProcessing;
+                                    this.isUploaded = true;
+                                    this.isProcessing = false;
                                     const input = document.getElementById('stockData');
                                     this.toggleClass(input, 'remove', 'is-invalid');
                                     this.fields.stockData = true;
                                     resolve({status: true});
                                 } else {
                                     this.notify('Failed to process data');
-                                    this.isUploaded = !this.isUploaded;
-                                    this.isProcessing = !this.isProcessing;
+                                    this.isUploaded = false;
+                                    this.isProcessing = false;
                                     const input = document.getElementById('stockData');
                                     input.value = '';
                                     this.toggleClass(input, 'remove', 'is-invalid');

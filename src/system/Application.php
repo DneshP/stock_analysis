@@ -54,4 +54,16 @@ class Application
     {
         return json_encode(['status' => false, 'data' => $data]);
     }
+
+    /**
+     * Log Errors
+     * @param $message
+     * @param $fileName
+     */
+    public static function log($message, $fileName)
+    {
+        $error_log = RUNTIME_PATH . DIRECTORY_SEPARATOR . $fileName;
+        $log = '['.date('Y-m-d H:i:s').']' . '-' . $message . PHP_EOL;
+        file_put_contents($error_log, $log, FILE_APPEND);
+    }
 }
