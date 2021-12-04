@@ -13,18 +13,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Validate composer.json and composer.lock
-      working-directory: ./src
-      run: composer validate
+#     - name: Validate composer.json and composer.lock
+#       working-directory: ./src
+#       run: composer validate
 
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v2
-      with:
-        path: ./src/vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-
+#     - name: Cache Composer packages
+#       id: composer-cache
+#       uses: actions/cache@v2
+#       with:
+#         path: ./src/vendor
+#         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+#         restore-keys: |
+#           ${{ runner.os }}-php-
 
     - name: Install dependencies
       working-directory: ./src
