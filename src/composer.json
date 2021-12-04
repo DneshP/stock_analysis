@@ -1,5 +1,6 @@
 {
     "name": "dinesh/stock_analysis",
+    "description": "Stock Analysis Tool",
     "autoload": {
         "psr-4": {
             "App\\": "../src/"
