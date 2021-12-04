@@ -96,7 +96,7 @@ class Welcome extends Controller
                                 $stock = implode(',', $raw);
                                 $data [] = "(".$stock.")";
                             } else {
-                                Application::log("Missing" . json_encode($raw), 'missing.txt');
+                                Application::log("Missing row id " . json_encode($raw), 'missing.txt');
                             }
                          }
                 }
