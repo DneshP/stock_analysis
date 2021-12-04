@@ -20,7 +20,7 @@ class Database
     }
 
     /**
-     * Apply migrations
+     * Apply Migrations
      */
     public function applyMigrations()
     {
@@ -37,7 +37,7 @@ class Database
             require_once MIGRATION_PATH . DIRECTORY_SEPARATOR . $migration;
             $Migration = new $className();
 
-            $this->log("Applying migrations $className");
+            $this->log("Applying Migrations $className");
             $Migration->up();
             $migrationsToSave[] = $migration;
             $this->log("Applied migration $className");
@@ -46,7 +46,7 @@ class Database
         if (!empty($migrationsToSave)) {
             $this->saveMigrations($migrationsToSave);
         } else {
-            $this->log("All migrations applied");
+            $this->log("All Migrations applied");
         }
     }
 
@@ -55,7 +55,7 @@ class Database
      */
     protected function createMigrationsTable()
     {
-        $this->pdo->exec("CREATE TABLE IF NOT EXISTS migrations (
+        $this->pdo->exec("CREATE TABLE IF NOT EXISTS Migrations (
             id INT AUTO_INCREMENT PRIMARY KEY,
             migration VARCHAR(255),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -63,23 +63,23 @@ class Database
     }
 
     /**
-     * Fetch applied migrations
+     * Fetch applied Migrations
      */
     protected function getAppliedMigrations()
     {
-        $statement = $this->pdo->prepare("SELECT migration FROM migrations");
+        $statement = $this->pdo->prepare("SELECT migration FROM Migrations");
         $statement->execute();
         return $statement->fetchAll(PDO::FETCH_COLUMN);
     }
 
     /**
-     * Save applied migrations
+     * Save applied Migrations
      * @param $migrations
      */
     protected function saveMigrations($migrations)
     {
         $values = implode(',', array_map(function ($m) { return "('$m')";}, $migrations));
-        $statement = $this->pdo->prepare("INSERT INTO migrations (migration) VALUES " . $values);
+        $statement = $this->pdo->prepare("INSERT INTO Migrations (migration) VALUES " . $values);
         $statement->execute();
     }
 
