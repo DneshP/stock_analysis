@@ -2,7 +2,7 @@
 
 namespace App\Database;
 
-require_once __DIR__ . DIRECTORY_SEPARATOR . '../config/Config.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR;
 
 use App\Models\Welcome;
 use PDO;

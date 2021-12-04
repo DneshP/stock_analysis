@@ -24,7 +24,7 @@ class StockAnalysisTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         /** To fetch the base url */
-        require_once __DIR__ . DIRECTORY_SEPARATOR . '../config/Config.php';
+        require_once __DIR__ . DIRECTORY_SEPARATOR;
         self::$uri = BASE_URL;
         self::$client = new Client([
             'base_uri' => self::$uri
