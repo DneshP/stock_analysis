@@ -63,7 +63,7 @@ abstract class Model
             $statement->execute();
             return $statement->fetchAll($mode);
         } catch (\Exception $exception) {
-            $this->log($exception);
+            Application::log(json_encode($exception), 'database_error.log');
             return false;
         }
     }
@@ -109,16 +109,5 @@ abstract class Model
         $params->where = [];
         $params->orderBy = [];
         return $params;
-    }
-
-    /**
-     * Log Errors
-     * @param $message
-     */
-    protected function log($message)
-    {
-        $error_log = RUNTIME_PATH . DIRECTORY_SEPARATOR . 'log.txt';
-        $log = '['.date('Y-m-d H:i:s').']' . '-' . $message . PHP_EOL;
-        file_put_contents($error_log, $log, FILE_APPEND);
     }
 }
