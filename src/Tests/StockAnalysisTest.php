@@ -24,7 +24,7 @@ class StockAnalysisTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         /** To fetch the base url */
-        require_once __DIR__ . DIRECTORY_SEPARATOR;
+        require_once __DIR__ . DIRECTORY_SEPARATOR . '../Config/Config.php';
         self::$uri = BASE_URL;
         self::$client = new Client([
             'base_uri' => self::$uri
@@ -53,7 +53,7 @@ class StockAnalysisTest extends TestCase
      */
     public function testAccessWelcome()
     {
-        $response = self::$client->get(self::$uri . 'welcome');
+        $response = self::$client->get(self::$uri . '/welcome');
         $this->assertEquals(200, $response->getStatusCode());
     }
 
@@ -65,7 +65,7 @@ class StockAnalysisTest extends TestCase
     {
         self::$stockDataSeeder->seedStockData();
 
-        $post = self::$client->post(self::$uri . 'analyseStockData',
+        $post = self::$client->post(self::$uri . '/analyseStockData',
             [
                 'form_params' => [
                     'stock'     => 'appl',
@@ -92,7 +92,7 @@ class StockAnalysisTest extends TestCase
         $expected->meanStockPrice = 1477.286;
         $expected->standardDeviation = 55.874;
 
-        $post = self::$client->post(self::$uri . 'analyseStockData',
+        $post = self::$client->post(self::$uri . '/analyseStockData',
             [
                 'form_params' => [
                     'stock'     => 'googl',
@@ -120,7 +120,7 @@ class StockAnalysisTest extends TestCase
         $expected->meanStockPrice = 1455;
         $expected->standardDeviation = 198.879;
 
-        $post = self::$client->post(self::$uri . 'analyseStockData',
+        $post = self::$client->post(self::$uri . '/analyseStockData',
             [
                 'form_params' => [
                     'stock'     => 'googl',
